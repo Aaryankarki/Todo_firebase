@@ -4,12 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'firebase_options.dart';
 
+//main code 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
 
+//materialapp
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
@@ -22,7 +24,10 @@ class MyApp extends StatelessWidget {
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          if (snapshot.connectionState == ConnectionState.waiting)
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
           if (snapshot.hasData) return const TodoPage();
           return const AuthPage();
         },
@@ -56,7 +61,9 @@ class _AuthPageState extends State<AuthPage> {
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
 
@@ -68,15 +75,29 @@ class _AuthPageState extends State<AuthPage> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            TextField(controller: emailController, decoration: const InputDecoration(labelText: 'Email')),
+            TextField(
+              controller: emailController,
+              decoration: const InputDecoration(labelText: 'Email'),
+            ),
             const SizedBox(height: 10),
-            TextField(controller: passwordController, obscureText: true, decoration: const InputDecoration(labelText: 'Password')),
+            TextField(
+              controller: passwordController,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'Password'),
+            ),
             const SizedBox(height: 20),
-            ElevatedButton(onPressed: handleAuth, child: Text(isLogin ? 'Login' : 'Register')),
+            ElevatedButton(
+              onPressed: handleAuth,
+              child: Text(isLogin ? 'Login' : 'Register'),
+            ),
             TextButton(
               onPressed: () => setState(() => isLogin = !isLogin),
-              child: Text(isLogin ? "Don't have an account? Register" : "Already have an account? Login"),
-            )
+              child: Text(
+                isLogin
+                    ? "Don't have an account? Register"
+                    : "Already have an account? Login",
+              ),
+            ),
           ],
         ),
       ),
@@ -106,7 +127,9 @@ class _TodoPageState extends State<TodoPage> {
   }
 
   Future<void> toggleDone(String docId, bool isDone) async {
-    await FirebaseFirestore.instance.collection('todos').doc(docId).update({'isDone': !isDone});
+    await FirebaseFirestore.instance.collection('todos').doc(docId).update({
+      'isDone': !isDone,
+    });
   }
 
   Future<void> deleteTodo(String docId) async {
@@ -115,17 +138,21 @@ class _TodoPageState extends State<TodoPage> {
 
   @override
   Widget build(BuildContext context) {
-    final todosStream = FirebaseFirestore.instance
-        .collection('todos')
-        .where('userId', isEqualTo: user.uid)
-        .orderBy('timestamp', descending: true)
-        .snapshots();
+    final todosStream =
+        FirebaseFirestore.instance
+            .collection('todos')
+            .where('userId', isEqualTo: user.uid)
+            .orderBy('timestamp', descending: true)
+            .snapshots();
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("Your Todos"),
         actions: [
-          IconButton(onPressed: () => FirebaseAuth.instance.signOut(), icon: const Icon(Icons.logout)),
+          IconButton(
+            onPressed: () => FirebaseAuth.instance.signOut(),
+            icon: const Icon(Icons.logout),
+          ),
         ],
       ),
       body: Column(
@@ -148,8 +175,10 @@ class _TodoPageState extends State<TodoPage> {
             child: StreamBuilder<QuerySnapshot>(
               stream: todosStream,
               builder: (context, snapshot) {
-                if (snapshot.hasError) return const Center(child: Text('Something went wrong.'));
-                if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
+                if (snapshot.hasError)
+                  return const Center(child: Text('Something went wrong.'));
+                if (snapshot.connectionState == ConnectionState.waiting)
+                  return const Center(child: CircularProgressIndicator());
 
                 final docs = snapshot.data!.docs;
 
@@ -167,7 +196,10 @@ class _TodoPageState extends State<TodoPage> {
                     return ListTile(
                       title: Text(
                         text,
-                        style: TextStyle(decoration: isDone ? TextDecoration.lineThrough : null),
+                        style: TextStyle(
+                          decoration:
+                              isDone ? TextDecoration.lineThrough : null,
+                        ),
                       ),
                       leading: Checkbox(
                         value: isDone,
